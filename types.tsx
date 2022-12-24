@@ -19,6 +19,7 @@ export type RootStackParamList = {
   NotFound: undefined;
   ChatRoom:any;
   Home:undefined;
+  UsersScreen:undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<

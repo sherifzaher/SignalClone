@@ -5,7 +5,7 @@
  */
 import {Feather, FontAwesome} from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import {NavigationContainer, DefaultTheme, DarkTheme, useNavigation} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import {ColorSchemeName, Image, Pressable, Text, useWindowDimensions, View} from 'react-native';
@@ -15,6 +15,7 @@ import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import HomeScreen from '../screens/HomeScreen';
+import UsersScreen from '../screens/UsersScreen';
 import ChatRoomScreen from "../screens/ChatRoomScreen";
 import TabTwoScreen from '../screens/TabTwoScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
@@ -55,6 +56,13 @@ function RootNavigator() {
               headerBackTitleVisible:false
           }}
       />
+        <Stack.Screen
+            name="UsersScreen"
+            component={UsersScreen}
+            options={{
+                title:"Users",
+            }}
+        />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
@@ -66,6 +74,12 @@ function RootNavigator() {
 const HomeHeader = (props:any)=>{
     const { width } = useWindowDimensions();
     const colorScheme = useColorScheme();
+    const navigation = useNavigation();
+
+    const handleNavigate = ()=>{
+        console.warn("Navigate");
+        navigation.navigate("UsersScreen");
+    }
     return(
         <View
             style={{
@@ -87,7 +101,9 @@ const HomeHeader = (props:any)=>{
             />
             <Text style={{flex:1,textAlign:'center',marginLeft:50,fontWeight:'bold',fontSize:19,color:colorScheme === 'dark' ? 'white' : 'black'}}>Signal</Text>
             <Feather name="camera" size={24} color="#595959" style={{marginHorizontal:10}} />
-            <Feather name="edit-2" size={24} color="#595959" style={{marginHorizontal:5}}/>
+            <Pressable onPress={handleNavigate}>
+                <Feather name="edit-2" size={24} color="#595959" style={{marginHorizontal:5}}/>
+            </Pressable>
         </View>
     )
 };
