@@ -4,7 +4,7 @@ import {Auth} from 'aws-amplify';
 import ChatRoomItem from "../components/ChatRoomItem";
 
 import chatRoomsData from '../SignalAssets/dummy-data/ChatRooms';
-import {Text,View} from "../components/Themed";
+import { Text,View } from "../components/Themed";
 
 export default function HomeScreen() {
 

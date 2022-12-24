@@ -11,7 +11,7 @@ type ChatRoom @model @auth(rules: [{allow: public}]) {
   lastMessage: String
   LastMessage: Message @hasOne
   Messages: [Message] @hasMany(indexName: "byChatRoom", fields: ["id"])
-  Users: [User] @manyToMany(relationName: "ChatRoomUser")
+  ChatRoomUsers: [User] @manyToMany(relationName: "ChatRoomUser")
 }
 
 type User @model @auth(rules: [{allow: public}]) {
@@ -22,3 +22,4 @@ type User @model @auth(rules: [{allow: public}]) {
   Messages: [Message] @hasMany(indexName: "byUser", fields: ["id"])
   chatrooms: [ChatRoom] @manyToMany(relationName: "ChatRoomUser")
 }
+ 

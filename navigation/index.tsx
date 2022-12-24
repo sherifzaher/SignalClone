@@ -8,7 +8,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {NavigationContainer, DefaultTheme, DarkTheme, useNavigation} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import {ColorSchemeName, Image, Pressable, Text, useWindowDimensions, View} from 'react-native';
+import {ColorSchemeName, Image, Pressable, Text, TouchableOpacity, useWindowDimensions, View} from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
@@ -76,19 +76,13 @@ const HomeHeader = (props:any)=>{
     const colorScheme = useColorScheme();
     const navigation = useNavigation();
 
-    const handleNavigate = ()=>{
-        console.warn("Navigate");
-        navigation.navigate("UsersScreen");
-    }
     return(
         <View
             style={{
-                position:'absolute',
                 flexDirection:'row',
                 alignItems:'center',
                 justifyContent:'space-between',
-                padding:10,
-                width,
+                width:width-30,
             }}
         >
             <Image
@@ -99,11 +93,11 @@ const HomeHeader = (props:any)=>{
                 }}
                 source={{uri:"https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/vadim.jpg"}}
             />
-            <Text style={{flex:1,textAlign:'center',marginLeft:50,fontWeight:'bold',fontSize:19,color:colorScheme === 'dark' ? 'white' : 'black'}}>Signal</Text>
+            <Text style={{flex:1,textAlign:'center',fontWeight:'bold',fontSize:19,color:colorScheme === 'dark' ? 'white' : 'black'}}>Signal</Text>
             <Feather name="camera" size={24} color="#595959" style={{marginHorizontal:10}} />
-            <Pressable onPress={handleNavigate}>
-                <Feather name="edit-2" size={24} color="#595959" style={{marginHorizontal:5}}/>
-            </Pressable>
+            <TouchableOpacity onPress={()=>navigation.navigate("UsersScreen")} style={{width:24,height:24}}>
+                <Feather name="edit-2" size={24} color="#595959" />
+            </TouchableOpacity>
         </View>
     )
 };

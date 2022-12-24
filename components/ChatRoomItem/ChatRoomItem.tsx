@@ -8,6 +8,7 @@ export default function ChatRoomItem({chatRoom}:any) {
     const navigation = useNavigation();
     const onPress = ()=>{
         navigation.navigate('ChatRoom',{id:chatRoom.id});
+        // navigation.navigate("UsersScreen");
     };
 
     return (

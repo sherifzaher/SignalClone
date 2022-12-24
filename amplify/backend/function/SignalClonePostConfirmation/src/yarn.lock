@@ -2,11 +2,6 @@
 # yarn lockfile v1
 
 
-"@types/aws-lambda@^8.10.92":
-  "integrity" "sha512-/ME92FneNyXQzrAfcnQQlW1XkCZGPDlpi2ao1MJwecN+6SbeonKeggU8eybv1DfKli90FAVT1MlIZVXfwVuCyg=="
-  "resolved" "https://registry.npmjs.org/@types/aws-lambda/-/aws-lambda-8.10.109.tgz"
-  "version" "8.10.109"
-
 "asynckit@^0.4.0":
   "integrity" "sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q=="
   "resolved" "https://registry.npmjs.org/asynckit/-/asynckit-0.4.0.tgz"
