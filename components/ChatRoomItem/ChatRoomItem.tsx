@@ -1,9 +1,10 @@
 import {useEffect, useState} from "react";
-import {Image, Pressable,ActivityIndicator} from "react-native";
+import {Image, Pressable,ActivityIndicator, View} from "react-native";
 import {useNavigation} from "@react-navigation/native";
 import {Auth,DataStore} from "aws-amplify";
+import moment from 'moment';
 
-import {Text,View} from "../Themed";
+import {Text,View as ThemedView} from "../Themed";
 import styles from './styles';
 import {User,Message} from '../../src/models'
 
@@ -12,7 +13,7 @@ export default function ChatRoomItem({chatRoom}:any) {
     const [lastMessage,setLastMessage] = useState<Message| null>(null);
     const navigation = useNavigation();
     const onPress = ()=>{
-        navigation.navigate('ChatRoom',{id:chatRoom.id});
+        navigation.navigate('ChatRoom',{chatRoom});
     };
 
     useEffect(()=>{
@@ -32,6 +33,11 @@ export default function ChatRoomItem({chatRoom}:any) {
         fetchData();
     },[]);
 
+    // Get Last message
+    useEffect(()=>{
+        chatRoom.LastMessage.then((res:any)=>res&& setLastMessage(res));
+    },[chatRoom])
+
     if(!user || !lastMessage){
         return  <ActivityIndicator />
     }
@@ -39,7 +45,7 @@ export default function ChatRoomItem({chatRoom}:any) {
 
     return (
         <Pressable onPress={onPress} style={styles.container}>
-            <Image source={{uri: user?.imageUri || "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/elon.png"}} style={styles.image}/>
+            <Image source={{uri: user?.imageUri ?? 'https://i.stack.imgur.com/34AD2.jpg'}} style={styles.image}/>
             {
                 chatRoom.newMessages > 0 && (
                     <View style={styles.badgeContainer}>
@@ -49,8 +55,8 @@ export default function ChatRoomItem({chatRoom}:any) {
             }
             <View style={styles.right}>
                 <View style={styles.row}>
-                    <Text style={styles.name}>{user?.name || "as"}</Text>
-                    <Text style={styles.text}>{lastMessage.createdAt ?? "Now"}</Text>
+                    <Text style={styles.name}>{user.name}</Text>
+                    <Text style={styles.text}>{moment(chatRoom.updatedAt).fromNow()}</Text>
                 </View>
                 <Text numberOfLines={1} style={styles.text}>{lastMessage.content ?? `Send ${user.name} a message`}</Text>
             </View>

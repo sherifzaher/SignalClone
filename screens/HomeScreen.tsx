@@ -2,14 +2,15 @@ import {useEffect, useState} from "react";
 import {StyleSheet, Pressable } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Auth, DataStore } from 'aws-amplify';
-import {ChatRoom,ChatRoomUser} from "../src/models";
 
+import {ChatRoom, ChatRoomUser, User} from "../src/models";
 import ChatRoomItem from "../components/ChatRoomItem";
-import chatRoomsData from '../SignalAssets/dummy-data/ChatRooms';
+// import chatRoomsData from '../SignalAssets/dummy-data/ChatRooms';
 import { Text,View } from "../components/Themed";
 
 export default function HomeScreen() {
     const [chatRooms,setChatRooms] = useState<ChatRoom[] | any>([]);
+    const [me,setMe] = useState<User | null>(null);
 
     useEffect(()=>{
         fetchChatRooms();
@@ -18,6 +19,7 @@ export default function HomeScreen() {
     // Fetch Room Function
     const fetchChatRooms = async ()=>{
         const userData = await Auth.currentAuthenticatedUser();
+        DataStore.query(User,userData.attributes.sub).then(res=> res&& setMe(res));
         // const room = await DataStore.query(ChatRoom);
         // for await (const post of room){
         //     const messages = await post.Users.toArray();
@@ -37,11 +39,16 @@ export default function HomeScreen() {
 
     };
 
-    // useEffect(()=>{
-    //     const subscription = DataStore.observe(ChatRoomUser, chat => chat.userId.eq()).subscribe(msg => {
-    //         console.log(msg.model, msg.opType, msg.element);
-    //     });
-    // },[])
+    useEffect(()=>{
+        const subscription = DataStore.observe(ChatRoom,chat=> chat.Users.userId.eq(me?.id)).subscribe(msg => {
+            if(msg.element){
+                setChatRooms((prev:ChatRoom[])=> prev.map((chatroom)=>chatroom.id === msg.element.id ? msg.element : chatroom));
+            }
+            // msg.model, msg.opType,
+        });
+
+        return()=> subscription.unsubscribe();
+    },[me])
 
     const logOut = ()=>{
         Auth.signOut();

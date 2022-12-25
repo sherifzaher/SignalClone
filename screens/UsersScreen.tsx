@@ -1,5 +1,5 @@
 import {useState,useEffect} from "react";
-import {StyleSheet } from "react-native";
+import {ActivityIndicator, StyleSheet} from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import {Auth, DataStore} from "aws-amplify";
 
@@ -18,6 +18,15 @@ export default function UsersScreen() {
 
         fetchData();
     },[]);
+
+
+    if(!users){
+        return  (
+            <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center',marginVertical:30}}>
+                <ActivityIndicator size={"large"} />
+            </View>
+        )
+    };
 
 
   return (

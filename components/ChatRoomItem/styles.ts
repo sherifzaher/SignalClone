@@ -4,6 +4,8 @@ const styles = StyleSheet.create({
     container:{
         flexDirection:'row',
         padding:10,
+        marginVertical:10,
+        backgroundColor:'rgba(238,238,238,0.09)'
     },
     image:{
         height:50,
@@ -42,7 +44,8 @@ const styles = StyleSheet.create({
     },
     right:{
         flex:1,
-        justifyContent:'center'
+        justifyContent:'center',
+
     },
 });
 

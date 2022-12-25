@@ -9,7 +9,6 @@ import {
     Platform
 } from 'react-native';
 import {Auth, DataStore} from "aws-amplify";
-import {ChatRoom, Message} from "../../src/models";
 
 import {
     SimpleLineIcons,
@@ -19,6 +18,10 @@ import {
     Ionicons
 } from '@expo/vector-icons';
 
+import EmojiPicker from 'react-native-emoji-selector'
+
+import {ChatRoom, Message} from "../../src/models";
+
 interface Props{
     chatRoom:ChatRoom
 }
@@ -26,6 +29,7 @@ interface Props{
 const MessageInput = ({chatRoom}:Props) => {
 
   const [message,setMessage] = useState<string>("");
+  const [isEmojiPickerOpen,setIsEmojiPickerOpen] = useState<boolean>(false);
 
   const sendMessage = async ()=>{
       const myID = await Auth.currentAuthenticatedUser();
@@ -36,12 +40,15 @@ const MessageInput = ({chatRoom}:Props) => {
       }));
       updateLastMessage(newMessage);
       setMessage("");
+      setIsEmojiPickerOpen(false);
   };
 
   const updateLastMessage = async (newMessage:Message)=>{
     await DataStore.save(ChatRoom.copyOf(chatRoom,updatedChatRoom => {
         updatedChatRoom.LastMessage = newMessage
+        // updatedChatRoom.newMessages = updatedChatRoom.newMessages + 1 || 1
     }));
+
   };
 
   const onPlusClicked = ()=>{
@@ -58,29 +65,40 @@ const MessageInput = ({chatRoom}:Props) => {
 
   return (
       <KeyboardAvoidingView
-          style={styles.root}
+          style={[styles.root,{height: isEmojiPickerOpen ? '50%' : 'auto'}]}
           behavior={Platform.OS === "ios" ? 'padding' : 'height'}
           keyboardVerticalOffset={95}
       >
-          <View style={styles.inputContainer}>
-              <SimpleLineIcons name="emotsmile" size={24} color="#595959" style={styles.icon} />
-              <TextInput
-                  style={styles.input}
-                  value={message}
-                  placeholder={"Signal message..."}
-                  onChangeText={setMessage}
-              />
-              <Feather name="camera" size={24} color="#595959" style={styles.icon} />
-              <MaterialCommunityIcons name="microphone-outline" size={24} color="#595959" style={styles.icon} />
-          </View>
+          <View style={styles.row}>
+              <View style={styles.inputContainer}>
+                  <Pressable onPress={()=>setIsEmojiPickerOpen(prev=>!prev)}>
+                      <SimpleLineIcons name="emotsmile" size={24} color="#595959" style={styles.icon} />
+                  </Pressable>
+                  <TextInput
+                      style={styles.input}
+                      value={message}
+                      placeholder={"Signal message..."}
+                      onChangeText={setMessage}
+                  />
+                  <Feather name="camera" size={24} color="#595959" style={styles.icon} />
+                  <MaterialCommunityIcons name="microphone-outline" size={24} color="#595959" style={styles.icon} />
+              </View>
 
-          <Pressable onPress={onPress} style={styles.buttonContainer}>
-              {
-                  message
-                  ? <Ionicons name="send" size={18} color="white" />
-                  : <AntDesign name="plus" size={18} color="white" />
-              }
-          </Pressable>
+              <Pressable onPress={onPress} style={styles.buttonContainer}>
+                  {
+                      message
+                          ? <Ionicons name="send" size={18} color="white" />
+                          : <AntDesign name="plus" size={18} color="white" />
+                  }
+              </Pressable>
+          </View>
+          {isEmojiPickerOpen ? (
+              <EmojiPicker
+                  onEmojiSelected={(emoji)=> setMessage(prev => prev + emoji)}
+                  columns={8}
+                  showSearchBar={false}
+              />
+          ) : null}
       </KeyboardAvoidingView>
   )
   
@@ -88,8 +106,11 @@ const MessageInput = ({chatRoom}:Props) => {
 
 const styles = StyleSheet.create({
     root:{
+        padding:10,
+        height:"50%"
+    },
+    row:{
         flexDirection:'row',
-        padding:10
     },
     inputContainer:{
         backgroundColor:'#f2f2f2',

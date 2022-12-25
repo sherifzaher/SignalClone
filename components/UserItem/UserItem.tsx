@@ -1,14 +1,14 @@
-import {Image, Pressable} from "react-native";
+import { Auth, DataStore } from "aws-amplify";
+import { Image, Pressable} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+
 import {Text,View} from "../Themed";
 import styles from './styles';
-import {useNavigation} from "@react-navigation/native";
-import {Auth, DataStore} from "aws-amplify";
-import {ChatRoom,User,ChatRoomUser} from "../../src/models";
+import { ChatRoom, User, ChatRoomUser } from "../../src/models";
 
 export default function UserItem({user}:any) {
-    const navigation = useNavigation();
 
-    console.warn(user);
+    const navigation = useNavigation();
 
     const onPress =async ()=>{
 
@@ -24,13 +24,10 @@ export default function UserItem({user}:any) {
 
         const authUser = await Auth.currentAuthenticatedUser();
         const dbUser : any = await DataStore.query(User,authUser.attributes.sub);
-        console.warn(dbUser);
         await DataStore.save(new ChatRoomUser({
             user:dbUser,
             chatRoom:newChatRoom
         }));
-
-        console.warn(user);
 
         // Connect Clicked User with the chat room
 
@@ -39,14 +36,12 @@ export default function UserItem({user}:any) {
             chatRoom:newChatRoom
         }));
 
-        console.warn(other);
-
         navigation.navigate("ChatRoom",{id:newChatRoom.id});
     };
 
     return (
         <Pressable onPress={onPress} style={styles.container}>
-            <Image source={{uri: user.imageUri}} style={styles.image}/>
+            <Image source={{uri: user.imageUri ?? 'https://i.stack.imgur.com/34AD2.jpg'}} style={styles.image}/>
 
             <View style={styles.right}>
                 <View style={styles.row}>

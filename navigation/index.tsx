@@ -18,6 +18,7 @@ import HomeScreen from '../screens/HomeScreen';
 import UsersScreen from '../screens/UsersScreen';
 import ChatRoomScreen from "../screens/ChatRoomScreen";
 import TabTwoScreen from '../screens/TabTwoScreen';
+import ChatRoomHeader from './ChatRoomHeader';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
@@ -51,10 +52,10 @@ function RootNavigator() {
       <Stack.Screen
           name="ChatRoom"
           component={ChatRoomScreen}
-          options={{
-              headerTitle:ChatRoomHeader,
+          options={({route})=>({
+              headerTitle:()=> <ChatRoomHeader user={route.params} />,
               headerBackTitleVisible:false
-          }}
+          })}
       />
         <Stack.Screen
             name="UsersScreen"
@@ -102,35 +103,7 @@ const HomeHeader = (props:any)=>{
     )
 };
 
-const ChatRoomHeader = (props:any)=>{
-    const { width } = useWindowDimensions();
-    const colorScheme = useColorScheme();
-    return(
-        <View
-            style={{
-                position:'absolute',
-                flexDirection:'row',
-                alignItems:'center',
-                justifyContent:'space-between',
-                padding:20,
-                paddingRight:10,
-                width:width-25,
-            }}
-        >
-            <Image
-                style={{
-                    height:30,
-                    width:30,
-                    borderRadius:30
-                }}
-                source={{uri:"https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/vadim.jpg"}}
-            />
-            <Text style={{flex:1,marginLeft:10,fontWeight:'bold',fontSize:19,color:colorScheme === 'dark' ? 'white' : 'black'}}>{props.children}</Text>
-            <Feather name="camera" size={24} color="#595959" style={{marginHorizontal:10}} />
-            <Feather name="edit-2" size={24} color="#595959" style={{marginLeft:5}}/>
-        </View>
-    )
-};
+
 
 /**
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
