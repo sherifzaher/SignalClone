@@ -1,14 +1,19 @@
 import {View,Text} from "../Themed";
 import { StyleSheet } from 'react-native';
+import {useEffect} from "react";
 
 const blue = '#3777F0';
 const grey = 'lightgrey';
 
-const myID = "u1";
+const Message = ({message,me,other}:any) => {
 
-const Message = ({message}:any) => {
+    const isMe = message.userID === me.id;
 
-    const isMe = message.user.id === myID;
+    useEffect(()=>{
+        const checkIfMe = async ()=>{
+
+        }
+    },[]);
 
 
     return (
@@ -17,6 +22,10 @@ const Message = ({message}:any) => {
         ]}>
             <Text style={{color: isMe ? 'black' : 'white'}}>
                 {message?.content}
+            </Text>
+
+            <Text style={{color: isMe ? 'black' : 'white'}}>
+                {isMe ? me.name : other.name}
             </Text>
         </View>
       )

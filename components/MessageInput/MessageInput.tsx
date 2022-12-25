@@ -8,6 +8,8 @@ import {
     KeyboardAvoidingView,
     Platform
 } from 'react-native';
+import {Auth, DataStore} from "aws-amplify";
+import {ChatRoom, Message} from "../../src/models";
 
 import {
     SimpleLineIcons,
@@ -17,13 +19,29 @@ import {
     Ionicons
 } from '@expo/vector-icons';
 
-const MessageInput = () => {
+interface Props{
+    chatRoom:ChatRoom
+}
+
+const MessageInput = ({chatRoom}:Props) => {
 
   const [message,setMessage] = useState<string>("");
 
-  const sendMessage = ()=>{
-    console.warn('Sending: ',message);
-    setMessage('');
+  const sendMessage = async ()=>{
+      const myID = await Auth.currentAuthenticatedUser();
+      const newMessage = await  DataStore.save(new Message({
+          content:message,
+          userID:myID.attributes.sub,
+          chatroomID:chatRoom.id
+      }));
+      updateLastMessage(newMessage);
+      setMessage("");
+  };
+
+  const updateLastMessage = async (newMessage:Message)=>{
+    await DataStore.save(ChatRoom.copyOf(chatRoom,updatedChatRoom => {
+        updatedChatRoom.LastMessage = newMessage
+    }));
   };
 
   const onPlusClicked = ()=>{

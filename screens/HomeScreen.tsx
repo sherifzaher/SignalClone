@@ -12,32 +12,36 @@ export default function HomeScreen() {
     const [chatRooms,setChatRooms] = useState<ChatRoom[] | any>([]);
 
     useEffect(()=>{
-        const fetchChatRooms = async ()=>{
-            const userData = await Auth.currentAuthenticatedUser();
-            // const room = await DataStore.query(ChatRoom);
-            // for await (const post of room){
-            //     const messages = await post.Users.toArray();
-            //     console.warn(messages);
-            // }
-            const fetchedData = (await DataStore.query(ChatRoomUser, chat=> chat.userId.eq(userData.attributes.sub)));
-            let newChats : ChatRoom[] = [];
-            for await (const user of fetchedData){
-                await user.chatRoom.then(res=>{
-                    // res.Users.toArray().then(res=> res.map(i=>i.user))
-                    console.warn(res);
-                    newChats = [...newChats,res]
-                    setChatRooms((prev:ChatRoom[])=>[...prev,res]);
-                });
-            }
-
-            // const newData = await Promise.all(fetchedData.map(async data=>await data.chatRoom.then(res=>res)));
-            // setChatRooms(fetchedData);
-            console.warn(fetchedData);
-            // console.warn(newChats);
-        };
-
         fetchChatRooms();
     },[]);
+
+    // Fetch Room Function
+    const fetchChatRooms = async ()=>{
+        const userData = await Auth.currentAuthenticatedUser();
+        // const room = await DataStore.query(ChatRoom);
+        // for await (const post of room){
+        //     const messages = await post.Users.toArray();
+        //     console.warn(messages);
+        // }
+        const fetchedData = await DataStore.query(ChatRoomUser, chat=> chat.userId.eq(userData.attributes.sub));
+        let newChats : ChatRoom[] = [];
+        for await (const user of fetchedData){
+            await user.chatRoom.then(res=>{
+                // res.LastMessage.then()
+                // res.Users.toArray().then(res=> res.map(i=>i.user))
+                // console.warn(res);
+                newChats = [...newChats,res]
+                setChatRooms((prev:ChatRoom[])=>[...prev,res]);
+            });
+        }
+
+    };
+
+    // useEffect(()=>{
+    //     const subscription = DataStore.observe(ChatRoomUser, chat => chat.userId.eq()).subscribe(msg => {
+    //         console.log(msg.model, msg.opType, msg.element);
+    //     });
+    // },[])
 
     const logOut = ()=>{
         Auth.signOut();

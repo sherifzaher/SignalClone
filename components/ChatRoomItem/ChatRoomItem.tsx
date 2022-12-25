@@ -5,23 +5,26 @@ import {Auth,DataStore} from "aws-amplify";
 
 import {Text,View} from "../Themed";
 import styles from './styles';
-import {User} from '../../src/models'
+import {User,Message} from '../../src/models'
 
 export default function ChatRoomItem({chatRoom}:any) {
     const [user,setUser] = useState<User | null>(null);
-    // const user = chatRoom.users[1];
+    const [lastMessage,setLastMessage] = useState<Message| null>(null);
     const navigation = useNavigation();
     const onPress = ()=>{
         navigation.navigate('ChatRoom',{id:chatRoom.id});
-        // navigation.navigate("UsersScreen");
     };
 
     useEffect(()=>{
         const fetchData  = async ()=>{
             const users = await chatRoom.Users.toArray();
             const meID = await Auth.currentAuthenticatedUser();
+
             let otherId = "";
             users.forEach((user:any)=> user.userId === meID.attributes.sub ? null : otherId = user.userId);
+
+            // Get Chat room last message LazyLoad Item from the parent chatroom amplify doc's
+            chatRoom.LastMessage.then((res:any)=>res&& setLastMessage(res));
             const userData : any = await DataStore.query(User,otherId);
             setUser(userData);
         };
@@ -29,7 +32,7 @@ export default function ChatRoomItem({chatRoom}:any) {
         fetchData();
     },[]);
 
-    if(!user){
+    if(!user || !lastMessage){
         return  <ActivityIndicator />
     }
 
@@ -47,9 +50,9 @@ export default function ChatRoomItem({chatRoom}:any) {
             <View style={styles.right}>
                 <View style={styles.row}>
                     <Text style={styles.name}>{user?.name || "as"}</Text>
-                    <Text style={styles.text}>{chatRoom?.lastMessage?.createdAt || "Now"}</Text>
+                    <Text style={styles.text}>{lastMessage.createdAt ?? "Now"}</Text>
                 </View>
-                <Text numberOfLines={1} style={styles.text}>{chatRoom?.lastMessage?.content || `Send ${user.name} a message`}</Text>
+                <Text numberOfLines={1} style={styles.text}>{lastMessage.content ?? `Send ${user.name} a message`}</Text>
             </View>
 
         </Pressable>
