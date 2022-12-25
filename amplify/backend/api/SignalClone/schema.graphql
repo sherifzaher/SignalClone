@@ -1,6 +1,6 @@
 type Message @model @auth(rules: [{allow: public}]) {
   id: ID!
-  content: String
+  content: String!
   userID: ID! @index(name: "byUser")
   chatroomID: ID! @index(name: "byChatRoom")
 }
@@ -8,10 +8,9 @@ type Message @model @auth(rules: [{allow: public}]) {
 type ChatRoom @model @auth(rules: [{allow: public}]) {
   id: ID!
   newMessages: Int
-  lastMessage: String
   LastMessage: Message @hasOne
   Messages: [Message] @hasMany(indexName: "byChatRoom", fields: ["id"])
-  ChatRoomUsers: [User] @manyToMany(relationName: "ChatRoomUser")
+  Users: [User] @manyToMany(relationName: "ChatRoomUser")
 }
 
 type User @model @auth(rules: [{allow: public}]) {

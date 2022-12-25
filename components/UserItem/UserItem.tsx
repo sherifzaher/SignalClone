@@ -8,7 +8,15 @@ import {ChatRoom,User,ChatRoomUser} from "../../src/models";
 export default function UserItem({user}:any) {
     const navigation = useNavigation();
 
+    console.warn(user);
+
     const onPress =async ()=>{
+
+        // Check if this room is initiated
+        // const foundChatRoom = await DataStore.query(ChatRoom,c=>c.Users.userId.eq);
+        // if(foundChatRoom){
+            // return navigation.navigate("ChatRoom",{id:foundChatRoom.});
+        // }
         // Create A Chat Room
         const newChatRoom = await DataStore.save(new ChatRoom({newMessages:0}));
 
@@ -16,17 +24,22 @@ export default function UserItem({user}:any) {
 
         const authUser = await Auth.currentAuthenticatedUser();
         const dbUser : any = await DataStore.query(User,authUser.attributes.sub);
+        console.warn(dbUser);
         await DataStore.save(new ChatRoomUser({
             user:dbUser,
             chatRoom:newChatRoom
         }));
 
+        console.warn(user);
+
         // Connect Clicked User with the chat room
 
-        await DataStore.save(new ChatRoomUser({
+        const other  = await DataStore.save(new ChatRoomUser({
             user,
             chatRoom:newChatRoom
         }));
+
+        console.warn(other);
 
         navigation.navigate("ChatRoom",{id:newChatRoom.id});
     };
@@ -37,7 +50,7 @@ export default function UserItem({user}:any) {
 
             <View style={styles.right}>
                 <View style={styles.row}>
-                    <Text style={styles.name}>{user.name}</Text>
+                    <Text style={styles.name}>{user.name || "s"}</Text>
                 </View>
             </View>
 

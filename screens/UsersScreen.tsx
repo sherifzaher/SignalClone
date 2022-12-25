@@ -1,7 +1,7 @@
 import {useState,useEffect} from "react";
 import {StyleSheet } from "react-native";
 import { FlashList } from "@shopify/flash-list";
-import { DataStore } from "aws-amplify";
+import {Auth, DataStore} from "aws-amplify";
 
 import { User } from '../src/models';
 import {Text, View} from "../components/Themed";
@@ -11,7 +11,12 @@ export default function UsersScreen() {
     const [users,setUsers] = useState<User[]>([]);
 
     useEffect(()=>{
-        DataStore.query(User).then(setUsers);
+        const fetchData = async ()=>{
+            const meID = await Auth.currentAuthenticatedUser();
+            DataStore.query(User).then(res=>setUsers(res.filter(user=>user.id !== meID.attributes.sub)));
+        };
+
+        fetchData();
     },[]);
 
 

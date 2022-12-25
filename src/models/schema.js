@@ -14,7 +14,7 @@ export const schema = {
                     "name": "content",
                     "isArray": false,
                     "type": "String",
-                    "isRequired": false,
+                    "isRequired": true,
                     "attributes": []
                 },
                 "userID": {
@@ -108,13 +108,6 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "lastMessage": {
-                    "name": "lastMessage",
-                    "isArray": false,
-                    "type": "String",
-                    "isRequired": false,
-                    "attributes": []
-                },
                 "LastMessage": {
                     "name": "LastMessage",
                     "isArray": false,
@@ -149,8 +142,8 @@ export const schema = {
                         ]
                     }
                 },
-                "ChatRoomUsers": {
-                    "name": "ChatRoomUsers",
+                "Users": {
+                    "name": "Users",
                     "isArray": true,
                     "type": {
                         "model": "ChatRoomUser"
@@ -421,5 +414,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.3.2",
-    "version": "f6862296051dfca2d9ba1efb3ccb4bcf"
+    "version": "88e556c706c5862c7cfa5ab84e7670d8"
 };
