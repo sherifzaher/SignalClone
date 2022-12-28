@@ -6,13 +6,18 @@ import moment from 'moment';
 
 import {Text,View as ThemedView} from "../Themed";
 import styles from './styles';
-import {User,Message} from '../../src/models'
+import {User, Message, ChatRoom} from '../../src/models'
 
 export default function ChatRoomItem({chatRoom}:any) {
     const [user,setUser] = useState<User | null>(null);
     const [lastMessage,setLastMessage] = useState<Message| null>(null);
     const navigation = useNavigation();
-    const onPress = ()=>{
+    const onPress =async ()=>{
+        await DataStore.save(ChatRoom.copyOf(chatRoom,updatedChatRoom => {
+            updatedChatRoom.newMessages = null
+            // updatedChatRoom.newMessages = updatedChatRoom.newMessages ? updatedChatRoom.newMessages + 1 : 1
+            // updatedChatRoom.newMessages = updatedChatRoom.newMessages + 1 || 1
+        }));
         navigation.navigate('ChatRoom',{chatRoom});
     };
 
@@ -55,8 +60,8 @@ export default function ChatRoomItem({chatRoom}:any) {
             }
             <View style={styles.right}>
                 <View style={styles.row}>
-                    <Text style={styles.name}>{user.name}</Text>
-                    <Text style={styles.text}>{moment(chatRoom.updatedAt).fromNow()}</Text>
+                    <Text style={styles.name}>{user.name.split('@')[0]}</Text>
+                    <Text style={styles.text}>{moment(lastMessage.createdAt).fromNow()}</Text>
                 </View>
                 <Text numberOfLines={1} style={styles.text}>{lastMessage.content ?? `Send ${user.name} a message`}</Text>
             </View>

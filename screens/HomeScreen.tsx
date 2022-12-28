@@ -26,16 +26,22 @@ export default function HomeScreen() {
         //     console.warn(messages);
         // }
         const fetchedData = await DataStore.query(ChatRoomUser, chat=> chat.userId.eq(userData.attributes.sub));
-        let newChats : ChatRoom[] = [];
-        for await (const user of fetchedData){
-            await user.chatRoom.then(res=>{
-                // res.LastMessage.then()
-                // res.Users.toArray().then(res=> res.map(i=>i.user))
-                // console.warn(res);
-                newChats = [...newChats,res]
-                setChatRooms((prev:ChatRoom[])=>[...prev,res]);
-            });
-        }
+        // DataStore.query(ChatRoom,chat=> chat)
+        await Promise.all(fetchedData.map(async (chatRoom)=> chatRoom.chatRoom.then(res=>{
+            if(res){
+                setChatRooms((prev:ChatRoom[])=> [...prev,res]);
+            }
+        })))
+        // fetchedData.map(item=> item.chatRoom)
+        // for await (const user of fetchedData){
+        //     await user.chatRoom.then(res=>{
+        //         // res.LastMessage.then()
+        //         // res.Users.toArray().then(res=> res.map(i=>i.user))
+        //         // console.warn(res);
+        //         newChats = [...newChats,res]
+        //         setChatRooms((prev:ChatRoom[])=>[...prev,res]);
+        //     });
+        // }
 
     };
 

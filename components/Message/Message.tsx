@@ -14,7 +14,7 @@ const Message = ({message,me,other}:any) => {
         <View style={[
             styles.container,isMe ? {...styles.rightContainer,marginTop:5} : styles.leftContainer
         ]}>
-            <Text style={{color: isMe ? 'black' : 'white'}}>
+            <Text style={{color: isMe ? 'black' : 'white',fontSize:16}}>
                 {message?.content}
             </Text>
 
@@ -22,7 +22,7 @@ const Message = ({message,me,other}:any) => {
                 color: isMe ? 'black' : 'white',
                 paddingTop:4,
                 fontSize:12,
-                opacity:70,
+                opacity:0.5,
                 marginLeft: isMe ?'auto' : 0,
                 marginRight: !isMe ? 'auto' : 0
             }}>
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
         margin:10,
         borderRadius:10,
         maxWidth:'75%',
-        marginTop:20
+        marginTop:20,
     },
     text:{
         color:'white',
