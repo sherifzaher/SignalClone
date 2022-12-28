@@ -2,19 +2,16 @@ import {useState,useEffect} from "react";
 import {Auth, DataStore, Storage} from "aws-amplify";
 import * as ImagePicker from 'expo-image-picker';
 import EmojiPicker from 'react-native-emoji-selector';
-// @ts-ignore
-import { v4 as uuidv4} from 'uuid';
+import uuid from 'react-native-uuid';
 
 import {
     View,
-    Text,
     StyleSheet,
     TextInput,
     Pressable,
     KeyboardAvoidingView,
     Platform, Alert, Image
 } from 'react-native';
-
 
 import {
     SimpleLineIcons,
@@ -58,6 +55,7 @@ const MessageInput = ({chatRoom}:Props) => {
           chatroomID:chatRoom.id
       }));
       updateLastMessage(newMessage);
+
       setMessage("");
       setIsEmojiPickerOpen(false);
   };
@@ -113,11 +111,11 @@ const MessageInput = ({chatRoom}:Props) => {
 
     const sendImage = async ()=>{
         if(!imageUri) return null;
+
         const blob = await getImageBlob();
-        await Storage.put(`${uuidv4()}.png`,blob);
+        const name =  uuid.v4();
+        await Storage.put(`${name}.png`,blob);
         console.warn("Uploaded");
-
-
     };
 
     const getImageBlob = async ()=>{
