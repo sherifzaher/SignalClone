@@ -91,9 +91,26 @@ export default function ChatRoomItem({ chatRoom }: any) {
             {moment(lastMessage.createdAt).fromNow()}
           </Text>
         </View>
-        <Text numberOfLines={1} style={styles.text}>
-          {iamTheSender ? "You: " + lastMessage.content : lastMessage.content}
-        </Text>
+
+        {/* If The Message is Text */}
+        {lastMessage.content && (
+          <Text numberOfLines={1} style={styles.text}>
+            {iamTheSender ? "You: " + lastMessage.content : lastMessage.content}
+          </Text>
+        )}
+
+        {/* If It's Audio Message */}
+        {lastMessage.audio && (
+          <Text numberOfLines={1} style={styles.text}>
+            {iamTheSender ? "You: " + "Audio Message" : "Audio Message"}
+          </Text>
+        )}
+
+        {lastMessage.image && (
+          <Text numberOfLines={1} style={styles.text}>
+            {iamTheSender ? "You: " + "Image" : "Image"}
+          </Text>
+        )}
       </View>
     </Pressable>
   );

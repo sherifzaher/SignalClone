@@ -3,6 +3,7 @@ import { Auth, DataStore, Storage } from "aws-amplify";
 import * as ImagePicker from "expo-image-picker";
 import EmojiPicker from "react-native-emoji-selector";
 import uuid from "react-native-uuid";
+import { Audio } from "expo-av";
 
 import {
   View,
@@ -13,6 +14,7 @@ import {
   Platform,
   Alert,
   Image,
+  Vibration,
 } from "react-native";
 
 import {
@@ -24,6 +26,9 @@ import {
 } from "@expo/vector-icons";
 
 import { ChatRoom, Message } from "../../src/models";
+import { AVPlaybackStatus } from "expo-av/build/AV.types";
+import { Text } from "../Themed";
+import AudioPlayer from "../AudioPlayer";
 
 interface Props {
   chatRoom: ChatRoom;
@@ -34,13 +39,17 @@ const MessageInput = ({ chatRoom }: Props) => {
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState<boolean>(false);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [soundURI, setSoundURI] = useState<string | null>(null);
 
+  // Request Permissions
   useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
         const libraryPermission =
           await ImagePicker.requestMediaLibraryPermissionsAsync();
         const photoResponse = await ImagePicker.requestCameraPermissionsAsync();
+        await Audio.requestPermissionsAsync();
 
         if (
           libraryPermission.status !== "granted" ||
@@ -52,6 +61,7 @@ const MessageInput = ({ chatRoom }: Props) => {
     })();
   }, []);
 
+  // Sending Message
   const sendMessage = async () => {
     const myID = await Auth.currentAuthenticatedUser();
     const newMessage = await DataStore.save(
@@ -86,6 +96,8 @@ const MessageInput = ({ chatRoom }: Props) => {
   const onPress = () => {
     if (imageUri) {
       sendImage();
+    } else if (soundURI) {
+      sendAudio();
     } else if (message) {
       sendMessage();
     } else {
@@ -124,6 +136,7 @@ const MessageInput = ({ chatRoom }: Props) => {
     setIsEmojiPickerOpen(false);
     setImageUri(null);
     setProgress(0);
+    setSoundURI(null);
   };
 
   const progressCallback = (progress: any) => {
@@ -134,7 +147,7 @@ const MessageInput = ({ chatRoom }: Props) => {
   const sendImage = async () => {
     if (!imageUri) return null;
 
-    const blob = await getImageBlob();
+    const blob = await getBlob(imageUri);
     const name = uuid.v4();
     const { key } = await Storage.put(`${name}.png`, blob, {
       progressCallback,
@@ -154,12 +167,78 @@ const MessageInput = ({ chatRoom }: Props) => {
     resetFields();
   };
 
-  const getImageBlob = async () => {
-    if (!imageUri) return null;
-
-    const response = await fetch(imageUri);
+  const getBlob = async (uri: string) => {
+    const response = await fetch(uri);
     const blob = await response.blob();
     return blob;
+  };
+
+  const startRecording = async () => {
+    try {
+      console.log("Requesting permissions..");
+      await Audio.requestPermissionsAsync();
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      console.log("Starting recording..");
+      Vibration.vibrate();
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      setRecording(recording);
+      console.log("Recording started");
+    } catch (err) {
+      console.error("Failed to start recording", err);
+    }
+  };
+
+  const stopRecording = async () => {
+    if (!recording) {
+      return;
+    }
+    console.log("Stopping recording..");
+    setRecording(null);
+    await recording.stopAndUnloadAsync();
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+    });
+    const uri = recording.getURI();
+    // console.warn('Recording stopped and stored at', uri);
+
+    if (!uri) {
+      return;
+    }
+
+    setSoundURI(uri);
+
+    // setPaused(true);
+  };
+
+  const sendAudio = async () => {
+    if (!soundURI) return null;
+
+    const uriParts = soundURI.split(".");
+    const extension = uriParts[uriParts.length - 1];
+    const blob = await getBlob(soundURI);
+    const name = uuid.v4();
+    const { key } = await Storage.put(`${name}.${extension}`, blob, {
+      progressCallback,
+    });
+
+    const myID = await Auth.currentAuthenticatedUser();
+    const newMessage = await DataStore.save(
+      new Message({
+        content: message,
+        audio: key,
+        userID: myID.attributes.sub,
+        chatroomID: chatRoom.id,
+      })
+    );
+    updateLastMessage(newMessage);
+
+    resetFields();
   };
 
   return (
@@ -202,6 +281,9 @@ const MessageInput = ({ chatRoom }: Props) => {
           </Pressable>
         </View>
       )}
+
+      {soundURI && <AudioPlayer soundURI={soundURI} />}
+
       <View style={styles.row}>
         <View style={styles.inputContainer}>
           <Pressable onPress={() => setIsEmojiPickerOpen((prev) => !prev)}>
@@ -236,22 +318,25 @@ const MessageInput = ({ chatRoom }: Props) => {
             />
           </Pressable>
 
-          <MaterialCommunityIcons
-            name="microphone-outline"
-            size={24}
-            color="#595959"
-            style={styles.icon}
-          />
+          <Pressable onPressIn={startRecording} onPressOut={stopRecording}>
+            <MaterialCommunityIcons
+              name={recording ? "microphone" : "microphone-outline"}
+              size={24}
+              color={recording ? "red" : "#595959"}
+              style={styles.icon}
+            />
+          </Pressable>
         </View>
 
         <Pressable onPress={onPress} style={styles.buttonContainer}>
-          {message || imageUri ? (
+          {message || imageUri || soundURI ? (
             <Ionicons name="send" size={18} color="white" />
           ) : (
             <AntDesign name="plus" size={18} color="white" />
           )}
         </Pressable>
       </View>
+
       {isEmojiPickerOpen ? (
         <EmojiPicker
           onEmojiSelected={(emoji) => setMessage((prev) => prev + emoji)}

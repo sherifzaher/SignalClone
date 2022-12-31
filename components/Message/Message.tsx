@@ -4,12 +4,22 @@ import { Image, StyleSheet, useWindowDimensions } from "react-native";
 import { S3Image } from "aws-amplify-react-native";
 
 import { View, Text } from "../Themed";
+import { useEffect, useState } from "react";
+import { Storage } from "aws-amplify";
+import AudioPlayer from "../AudioPlayer";
 const blue = "#3777F0";
 const grey = "lightgrey";
 
 const Message = ({ message, me, other }: any) => {
+  const [soundURI, setSoundURI] = useState<string | null>(null);
   const isMe = message.userID === me.id;
   const { width } = useWindowDimensions();
+
+  useEffect(() => {
+    if (message.audio) {
+      Storage.get(message.audio).then((res) => res && setSoundURI(res));
+    }
+  }, [message]);
 
   return (
     <View
@@ -18,6 +28,7 @@ const Message = ({ message, me, other }: any) => {
         isMe
           ? { ...styles.rightContainer, marginTop: 5 }
           : styles.leftContainer,
+        { width: soundURI ? "75%" : "auto" },
       ]}
     >
       {message?.image && (
@@ -33,6 +44,8 @@ const Message = ({ message, me, other }: any) => {
           {message.content}
         </Text>
       )}
+
+      {message.audio && soundURI && <AudioPlayer soundURI={soundURI} />}
 
       <Text
         style={{
