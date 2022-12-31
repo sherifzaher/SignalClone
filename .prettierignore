@@ -1,0 +1,8 @@
+amplify
+src
+SignalAssets
+node_modules
+.expo
+.idea
+.vscode
+assets
