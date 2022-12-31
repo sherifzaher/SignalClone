@@ -1,13 +1,13 @@
 export type AmplifyDependentResourcesAttributes = {
     "api": {
-        "SignalClone": {
+        "SignalClone1": {
             "GraphQLAPIKeyOutput": "string",
             "GraphQLAPIIdOutput": "string",
             "GraphQLAPIEndpointOutput": "string"
         }
     },
     "auth": {
-        "SignalClone": {
+        "SignalClone1": {
             "IdentityPoolId": "string",
             "IdentityPoolName": "string",
             "UserPoolId": "string",
@@ -18,16 +18,15 @@ export type AmplifyDependentResourcesAttributes = {
         }
     },
     "function": {
-        "SignalClonePostConfirmation": {
+        "SignalClone1PostAuthentication": {
             "Name": "string",
             "Arn": "string",
             "LambdaExecutionRole": "string",
-            "Region": "string",
-            "LambdaExecutionRoleArn": "string"
+            "Region": "string"
         }
     },
     "storage": {
-        "s31a0dbb33": {
+        "s3b9389347": {
             "BucketName": "string",
             "Region": "string"
         }

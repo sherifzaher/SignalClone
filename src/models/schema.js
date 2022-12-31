@@ -156,8 +156,8 @@ export const schema = {
                         ]
                     }
                 },
-                "Users": {
-                    "name": "Users",
+                "ChatRoomUsers": {
+                    "name": "ChatRoomUsers",
                     "isArray": true,
                     "type": {
                         "model": "ChatRoomUser"
@@ -428,5 +428,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.3.2",
-    "version": "1f1f4815df53a6b22aca0e5bb469c3d3"
+    "version": "f11541acc868fe61c832332ba620e1fd"
 };

@@ -4,7 +4,7 @@ import { FlashList } from "@shopify/flash-list";
 import { Auth, DataStore } from "aws-amplify";
 
 import { User } from "../src/models";
-import { Text, View } from "../components/Themed";
+import { View } from "../components/Themed";
 import UserItem from "../components/UserItem";
 
 export default function UsersScreen() {
@@ -13,12 +13,23 @@ export default function UsersScreen() {
   useEffect(() => {
     const fetchData = async () => {
       const meID = await Auth.currentAuthenticatedUser();
-      DataStore.query(User).then((res) =>
-        setUsers(res.filter((user) => user.id !== meID.attributes.sub))
-      );
+      // console.log(meID.)/;
+      DataStore.query(User).then((res) => {
+        setUsers(res.filter((user) => user.id !== meID.attributes.sub));
+        console.log(res.filter((user) => user.id !== meID.attributes.sub));
+        console.log(res);
+      });
     };
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const subs = DataStore.observe(User).subscribe((user) => {
+      setUsers((prev: any) => [user, ...prev]);
+    });
+
+    return () => subs.unsubscribe();
   }, []);
 
   if (!users) {

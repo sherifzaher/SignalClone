@@ -13,7 +13,7 @@ const AudioPlayer = ({ soundURI }: { soundURI: string }) => {
     const minutes = Math.floor(audioDuration / (60 * 1000));
     const seconds = Math.floor((audioDuration % (60 * 1000)) / 1000);
 
-    return `${minutes}:${seconds < 10 && "0"}${seconds}`;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
   useEffect(() => {
@@ -52,11 +52,11 @@ const AudioPlayer = ({ soundURI }: { soundURI: string }) => {
     if (!sound) return;
 
     if (paused) {
-      setPaused(false);
       await sound.playFromPositionAsync(0);
+      setPaused(false);
     } else {
-      setPaused(true);
       await sound.pauseAsync();
+      setPaused(true);
     }
   };
 

@@ -37,7 +37,6 @@ export default function ChatRoomScreen() {
       const fetchedUsers = await DataStore.query(User, (user) =>
         user.chatrooms.chatRoomId.eq(chatRoom.chatRoom.id)
       );
-      // fetchedChat && setUpdatedChatRoom(fetchedChat);
       fetchedUsers.forEach((user: User) => {
         if (user.id === meId) {
           setMe(user);
@@ -46,18 +45,22 @@ export default function ChatRoomScreen() {
           navigation.setParams({ user });
         }
       });
-      // other && navigation.setOptions({title:other.name});
     }
   };
 
   // Realtime Subscribe
   useEffect(() => {
-    const subscription = DataStore.observe(
-      ChatRoom,
-      chatRoom.chatRoom.id
+    const subscription = DataStore.observe(MessageModel, (msg) =>
+      msg.chatroomID.eq(chatRoom.chatRoom.id)
     ).subscribe((msg) => {
-      // console.warn(msg.model, msg.opType, msg.element);
-      setUpdatedChatRoom(msg.element);
+      if (msg.opType === "INSERT") {
+        // console.log("Holaaaa");
+        // console.log(msg.element);
+        setMessages((prev: MessageModel[]) => [msg.element, ...prev]);
+      }
+      // if(msg.opType === "UPDATE"){
+      //   setUpdatedChatRoom(msg.element);
+      // }
     });
     return () => subscription.unsubscribe();
   }, [chatRoom]);
@@ -74,6 +77,8 @@ export default function ChatRoomScreen() {
         sort: (message) => message.createdAt(SortDirection.DESCENDING),
       }
     );
+
+    console.log(fetchedMessages);
 
     // console.warn(fetchedMessages);
     setMessages(fetchedMessages);

@@ -71,7 +71,7 @@ const MessageInput = ({ chatRoom }: Props) => {
         chatroomID: chatRoom.id,
       })
     );
-    updateLastMessage(newMessage);
+    await updateLastMessage(newMessage);
 
     resetFields();
   };

@@ -6,7 +6,7 @@ import { Text, View } from "../Themed";
 import styles from "./styles";
 import { ChatRoom, User, ChatRoomUser } from "../../src/models";
 
-export default function UserItem({ user }: any) {
+export default function UserItem({ user }: { user: User }) {
   const navigation = useNavigation();
 
   const onPress = async () => {
@@ -19,7 +19,6 @@ export default function UserItem({ user }: any) {
     const newChatRoom = await DataStore.save(new ChatRoom({ newMessages: 0 }));
 
     // Connect Authenticated User with the chat room
-
     const authUser = await Auth.currentAuthenticatedUser();
     const dbUser: any = await DataStore.query(User, authUser.attributes.sub);
     await DataStore.save(

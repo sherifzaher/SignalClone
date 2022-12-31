@@ -21,6 +21,7 @@ export default function ChatRoomItem({ chatRoom }: any) {
       await DataStore.save(
         ChatRoom.copyOf(chatRoom, (updatedChatRoom) => {
           updatedChatRoom.newMessages = null;
+          // updatedChatRoom.ChatRoomUsers
           // updatedChatRoom.newMessages = updatedChatRoom.newMessages ? updatedChatRoom.newMessages + 1 : 1
           // updatedChatRoom.newMessages = updatedChatRoom.newMessages + 1 || 1
         })
@@ -31,7 +32,7 @@ export default function ChatRoomItem({ chatRoom }: any) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const users = await chatRoom.Users.toArray();
+      const users = await chatRoom.ChatRoomUsers.toArray();
       const meID = await Auth.currentAuthenticatedUser();
       setMe(meID.attributes.sub);
 
@@ -42,11 +43,14 @@ export default function ChatRoomItem({ chatRoom }: any) {
 
       // Get Chat room last message LazyLoad Item from the parent chatroom amplify doc's
       chatRoom.LastMessage.then((res: any) => {
-        res && setLastMessage(res);
-        if (res.userID && res.userID === meID.attributes.sub) {
-          setIamTheSender(true);
+        if (res) {
+          setLastMessage(res);
+          if (res?.userID && res.userID === meID.attributes.sub) {
+            setIamTheSender(true);
+          }
         }
       });
+
       const userData: any = await DataStore.query(User, otherId);
       setUser(userData);
     };
@@ -56,8 +60,25 @@ export default function ChatRoomItem({ chatRoom }: any) {
 
   // Get Last message
   useEffect(() => {
-    chatRoom.LastMessage.then((res: any) => res && setLastMessage(res));
-  }, [chatRoom]);
+    const subs = DataStore.observe(ChatRoom, chatRoom.id).subscribe((chatR) => {
+      if (chatR) {
+        console.log(chatR.element);
+        updateLastMessage(chatR.element.chatRoomLastMessageId || null);
+      }
+    });
+    // chatRoom.LastMessage.then((res: any) => res && setLastMessage(res));
+    // console.log("Fine",chatRoom);
+    return () => subs.unsubscribe();
+  }, [chatRoom.id, lastMessage]);
+
+  const updateLastMessage = async (id: string | null) => {
+    if (!id) return;
+    await DataStore.query(Message, id).then((res) => {
+      if (res) {
+        setLastMessage(res);
+      }
+    });
+  };
 
   useEffect(() => {
     if (lastMessage && lastMessage.userID === me) {
@@ -65,11 +86,13 @@ export default function ChatRoomItem({ chatRoom }: any) {
     } else {
       setIamTheSender(false);
     }
-  }, [lastMessage]);
+  }, [lastMessage, chatRoom]);
 
   if (!user || !lastMessage) {
     return <ActivityIndicator />;
   }
+
+  // console.log(chatRoom);
 
   return (
     <Pressable onPress={onPress} style={styles.container}>
@@ -88,29 +111,33 @@ export default function ChatRoomItem({ chatRoom }: any) {
         <View style={styles.row}>
           <Text style={styles.name}>{user.name.split("@")[0]}</Text>
           <Text style={styles.text}>
-            {moment(lastMessage.createdAt).fromNow()}
+            {moment(lastMessage?.createdAt).fromNow()}
           </Text>
         </View>
 
         {/* If The Message is Text */}
-        {lastMessage.content && (
+        {lastMessage?.content && (
           <Text numberOfLines={1} style={styles.text}>
-            {iamTheSender ? "You: " + lastMessage.content : lastMessage.content}
+            {iamTheSender
+              ? "You: " + lastMessage?.content
+              : lastMessage?.content}
           </Text>
         )}
 
         {/* If It's Audio Message */}
-        {lastMessage.audio && (
+        {lastMessage?.audio && (
           <Text numberOfLines={1} style={styles.text}>
             {iamTheSender ? "You: " + "Audio Message" : "Audio Message"}
           </Text>
         )}
 
-        {lastMessage.image && (
+        {lastMessage?.image && (
           <Text numberOfLines={1} style={styles.text}>
             {iamTheSender ? "You: " + "Image" : "Image"}
           </Text>
         )}
+
+        {!lastMessage && <Text>Send Your First Message =D</Text>}
       </View>
     </Pressable>
   );

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Pressable } from "react-native";
+import { StyleSheet, Pressable, TouchableOpacity } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Auth, DataStore } from "aws-amplify";
 
 import { ChatRoom, ChatRoomUser, User } from "../src/models";
 import ChatRoomItem from "../components/ChatRoomItem";
+import { AntDesign } from "@expo/vector-icons";
 // import chatRoomsData from '../SignalAssets/dummy-data/ChatRooms';
 import { Text, View } from "../components/Themed";
 
@@ -54,7 +55,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     const subscription = DataStore.observe(ChatRoom, (chat) =>
-      chat.Users.userId.eq(me?.id)
+      chat.ChatRoomUsers.userId.eq(me?.id)
     ).subscribe((msg) => {
       if (msg.element) {
         setChatRooms((prev: ChatRoom[]) =>
@@ -69,7 +70,8 @@ export default function HomeScreen() {
     return () => subscription.unsubscribe();
   }, [me]);
 
-  const logOut = () => {
+  const logOut = async () => {
+    // await DataStore.clear();
     Auth.signOut();
   };
   return (
@@ -82,10 +84,20 @@ export default function HomeScreen() {
           showsVerticalScrollIndicator={false}
         />
       )}
-      <View style={{ flexDirection: "row", justifyContent: "center" }}>
-        <Pressable onPress={logOut} style={styles.logout}>
-          <Text>Logout</Text>
-        </Pressable>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          flex: 1,
+          position: "absolute",
+          bottom: 0,
+          right: 10,
+        }}
+      >
+        <TouchableOpacity onPress={logOut} style={styles.logout}>
+          {/* <Text>Logout</Text> */}
+          <AntDesign name="logout" size={24} color="white" />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -94,6 +106,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
+    position: "relative",
   },
   logout: {
     backgroundColor: "red",
@@ -103,6 +116,6 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
-    width: 100,
+    width: 50,
   },
 });

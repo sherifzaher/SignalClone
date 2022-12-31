@@ -1,6 +1,6 @@
 {
   "api": {
-    "SignalClone": {
+    "SignalClone1": {
       "dependsOn": [],
       "output": {
         "authConfig": {
@@ -23,32 +23,32 @@
     }
   },
   "auth": {
-    "SignalClone": {
+    "SignalClone1": {
       "customAuth": false,
       "dependsOn": [
         {
+          "category": "function",
+          "resourceName": "SignalClone1PostAuthentication",
+          "triggerProvider": "Cognito",
           "attributes": [
             "Arn",
             "Name"
-          ],
-          "category": "function",
-          "resourceName": "SignalClonePostConfirmation",
-          "triggerProvider": "Cognito"
+          ]
         }
       ],
       "frontendAuthConfig": {
-        "mfaConfiguration": "OFF",
-        "mfaTypes": [
-          "SMS"
-        ],
-        "passwordProtectionSettings": {
-          "passwordPolicyCharacters": [],
-          "passwordPolicyMinLength": 8
-        },
-        "signupAttributes": [],
         "socialProviders": [],
         "usernameAttributes": [
           "EMAIL"
+        ],
+        "signupAttributes": [],
+        "passwordProtectionSettings": {
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": []
+        },
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
         ],
         "verificationMechanisms": [
           "EMAIL"
@@ -59,35 +59,17 @@
     }
   },
   "function": {
-    "SignalClonePostConfirmation": {
+    "SignalClone1PostAuthentication": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     }
   },
-  "parameters": {
-    "AMPLIFY_function_SignalClonePostConfirmation_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "SignalClonePostConfirmation"
-        }
-      ]
-    },
-    "AMPLIFY_function_SignalClonePostConfirmation_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "SignalClonePostConfirmation"
-        }
-      ]
-    }
-  },
   "storage": {
-    "s31a0dbb33": {
-      "dependsOn": [],
+    "s3b9389347": {
+      "service": "S3",
       "providerPlugin": "awscloudformation",
-      "service": "S3"
+      "dependsOn": []
     }
   }
 }
